@@ -9,10 +9,15 @@ class LinearBase(Estimator):
         self.reg_strength = reg_strength
         self.fit_intercept = fit_intercept
         self.w = None
-        self.w_history = []
 
     @abstractmethod
     def _update_weights(self, X, y):
+        """
+        Calculate weights 
+        
+        X : numpy array of shape (n_samples, n_feaures)
+        y : numpy array of shape (n_samples)
+        """
         pass
 
     def fit(self, X, y):
@@ -20,6 +25,14 @@ class LinearBase(Estimator):
         self._update_weights(Xb, y)
 
     def _add_intercept(self, X):
+        """
+        Add intecept in data X if needed
+        
+        X : numpy array of shape (n_samples, n_feaures)
+        
+        Return:
+            numpy array of shape (n_samples, n_features + 1)
+        """
         if self.fit_intercept:
             ones = np.ones((X.shape[0], 1))
             X = np.hstack([ones, X])

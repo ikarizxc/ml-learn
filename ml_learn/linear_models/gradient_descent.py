@@ -14,7 +14,7 @@ class GradientDescentBase(LinearBase):
         self.batch_size = batch_size
         self.n_epochs_to_stop = n_epochs_to_stop
         self.shuffle = shuffle
-        self._loss_func = mean_squared_error
+        self.loss_func = mean_squared_error
 
     def _update_weights(self, X, y):
         n, m = X.shape
@@ -24,7 +24,7 @@ class GradientDescentBase(LinearBase):
         best_loss = float('inf')
         n_epochs_without_changes = 0
         
-        for epoch in range(self.epochs):
+        for epoch in range(self.epochs):            
             if self.shuffle:
                 shuffled_indicies = np.random.permutation(n)
                 X = X[shuffled_indicies]
@@ -36,7 +36,9 @@ class GradientDescentBase(LinearBase):
                 w_new = self.w - self.learning_rate * self._calculate_gradient(X_batch, y_batch)
                 self.w = w_new
 
-            cur_loss = self._compute_loss(X.dot(self.w), y)
+            cur_loss = self._compute_loss(y, X.dot(self.w))
+            
+            self.loss_history.append(cur_loss)
             
             if self.verbose:
                 print(f"Epoch {epoch}. Loss: {cur_loss}")
@@ -54,6 +56,15 @@ class GradientDescentBase(LinearBase):
     
     @abstractmethod
     def _calculate_gradient(self, X, y):
+        """
+        Calculate gradient with regularization
+        
+        X : numpy array of shape (n_samples, n_feaures)
+        y : numpy array of shape (n_samples)
+        
+        Return:
+            numpy array of shape (n_samples)
+        """
         pass
 
 class GradientDescentRegression(GradientDescentBase):
@@ -78,7 +89,7 @@ class LogisticRegression(GradientDescentBase):
     def __init__(self, learning_rate=1e-2, reg='l2', epochs=1000, epsilon=1e-3, reg_strength=1e-2, n_epochs_to_stop=5, threshold=0.5, batch_size=None, shuffle=False, fit_intercept=True, verbose=False):
         super().__init__(learning_rate=learning_rate, reg=reg, epochs=epochs, epsilon=epsilon, reg_strength=reg_strength, batch_size=batch_size, fit_intercept=fit_intercept, verbose=verbose, shuffle=shuffle, n_epochs_to_stop=n_epochs_to_stop)
         self.threshold = threshold
-        self._loss_func = log_loss
+        self.loss_func = log_loss
         
     def _calculate_gradient(self, X, y):
         n, m = X.shape
@@ -95,6 +106,14 @@ class LogisticRegression(GradientDescentBase):
         return grad
         
     def predict_proba(self, X):
+        """
+        Predict probabilities
+        
+        X : numpy array of shape (n_samples, n_feaures)
+        
+        Return:
+            numpy array of shape (n_samples)
+        """
         pred = super().predict(X)
         return sigmoid(pred)
         
