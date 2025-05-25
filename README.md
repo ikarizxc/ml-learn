@@ -4,6 +4,7 @@ Library to learn machine learning algorithms
 
 ## Project structure
 
+```bash
 ml_learn/
 ├── abstractions/
 │   ├── init.py
@@ -19,4 +20,4 @@ ml_learn/
     ├── classification_metrics.py
     ├── plot.py
     └── regression_metrics.py
-
+```
